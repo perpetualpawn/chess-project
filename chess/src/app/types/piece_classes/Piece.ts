@@ -11,17 +11,82 @@ export abstract class Piece {
     /**
      * The rank (row) off the chess board that the piece is on.
      */
-    public rank: number;
+    private rank: number;
 
     /**
      * The file (column) of the chess board that the piece is on.
      */
-    public file: number;
+    private file: number;
 
     /**
      * The color of the piece.
      */
     public color: "white" | "black";
+
+    /**
+     * The type of the piece
+     */
+    public abstract pieceType: "pawn" | "knight" | "bishop" | "rook" | "queen" | "king";
+
+    /**
+     * The value (inclusive) for the bounds in which the piece can move on this rank,
+     * see other bound for other limit (inclusive) of range.
+     */
+    public rankUpperBound: number = 8;
+
+    /**
+     * The value (inclusive) for the bounds in which the piece can move on this rank,
+     * see other bound for other limit (inclusive) of range.
+     */
+    public rankLowerBound: number = 1;
+
+    /**
+     * The value (inclusive) for the bounds in which the piece can move on this file,
+     * see other bound for other limit (inclusive) of range.
+     */
+    public fileUpperBound: number = 8;
+
+    /**
+     * The value (inclusive) for the bounds in which the piece can move on this file,
+     * see other bound for other limit (inclusive) of range.
+     */
+    public fileLowerBound: number = 1;
+
+    /**
+     * gets the rank of the piece
+     * 
+     * @returns the rank of the piece
+     */
+    public getRank(): number {
+        return this.rank;
+    }
+
+    /**
+     * gets the file of the piece
+     * 
+     * @returns the file of the piece
+     */
+    public getFile(): number {
+        return this.file;
+    }
+
+    /**
+     * sets the file of this piece to the supplied value
+     * 
+     * @param file The value to set the file of the piece to
+     */
+    public setFile(file: number): void {
+        this.file = file;
+    }
+
+    /**
+     * sets the rank of the piece to the supplied value
+     * 
+     * @param rank the value to set the rank to
+     */
+    public setRank(rank: number): void {
+        this.rank = rank;
+    }
 
     /**
      * Sets up the basic structure that all pieces will follow,
@@ -37,28 +102,44 @@ export abstract class Piece {
         this.color = color;
     }
 
+    // == ------------------------------- SETTERS ---------------------------------- == //
+
+    /**
+     * Changes the limits for how many files are usable on the chess board.
+     * 
+     * @param lower The new lower bound (inclusive) for what files the pieces
+     * should be able to travel to.
+     * @param upper The new upper bound (inclusive) for what files the pieces
+     * should be able to travel to.
+     */
+    public setFileLimits(lower: number, upper: number): void {
+        this.fileLowerBound = lower;
+        this.fileUpperBound = upper;
+    }
+
+    /**
+     * Changes the limits for how many ranks are usable on the chess board.
+     * 
+     * @param lower The new lower bound (inclusive) for what ranks the pieces
+     * should be able to travel to.
+     * @param upper The new upper bound (inclusive) for what ranks the pieces
+     * should be able to travel to.
+     */
+    public setRankLimits(lower: number, upper: number): void {
+        this.rankLowerBound = lower;
+        this.rankLowerBound = upper;
+    }
+
     // == ---------------------------- FUNCTIONALITY ------------------------------- == //
 
     /**
-     * Gets a list of all the squares this piece can move to in the current position.
-     * Things that influence this are the type of the piece, whether or not it would place
-     * the king in check, and its move history (depending on the piece)
+     * Gets a list of moves that may or may not be legal in this position, solely
+     * based on whether or not the piece would be able to move there in the absense
+     * of any other pieces on the board.
      * 
      * @param boardState The current state of all the pieces on the board.
-     * @returns A list of all the legal moves in the position for this piece.
+     * @returns A list of all the potentially moves in the position for this piece.
      */
-    abstract getListOfLegalMoves(boardState: BoardState): Array<[rank: number, file: number]>;
-
-    public isMoveLegal(rank: number, file: number, boardState: BoardState): boolean {
-        const legalMoves: Array<[rank: number, file: number]> = this.getListOfLegalMoves(boardState);
-        for (const [legalRank, legalFile] of legalMoves) {
-            if (legalRank == rank && legalFile == file) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
+    abstract getListOfMoves(): Array<[rank: number, file: number]>;
 
 }
